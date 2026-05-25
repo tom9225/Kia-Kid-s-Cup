@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大會公告 - 2026 Kia Kid's Cup</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- 滑動浮出動畫套件 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+
+    <style>
+        /* ===============================
+           Lenis 平滑滾動設定
+        =============================== */
+        html.lenis { height: auto; }
+        .lenis.lenis-smooth { scroll-behavior: auto; }
+        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+        .lenis.lenis-stopped { overflow: hidden; }
+        .lenis.lenis-scrolling iframe { pointer-events: none; }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ===============================
+           背景粒子
+        =============================== */
+        #bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #0a1420 0%, var(--bg-dark) 80%);
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(193, 247, 34, 0.2);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(105vh) scale(0.5);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.6;
+            }
+            80% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-5vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* ===============================
+           標題區域
+        =============================== */
+        .page-header {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header h1 {
+            font-size: clamp(2.3rem, 6vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .page-header p {
+            color: var(--kia-green) !important;
+            font-size: 1.1rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        /* ===============================
+           公告列表
+        =============================== */
+        .notice-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .notice-item {
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 4px solid var(--kia-green);
+            padding: 25px 30px;
+            border-radius: 0 15px 15px 0;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.35s ease, border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        .notice-item::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(193, 247, 34, 0.08),
+                transparent
+            );
+            transition: left 0.6s ease;
+        }
+
+        .notice-item:hover {
+            transform: translateY(-6px);
+            background: rgba(255, 255, 255, 0.04);
+            border-left-color: #d7ff4a;
+            box-shadow: 0 18px 35px rgba(0, 0, 0, 0.35);
+        }
+
+        .notice-item:hover::before {
+            left: 100%;
+        }
+
+        .notice-date {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: block;
+            letter-spacing: 1px;
+        }
+
+        .notice-item h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .notice-preview {
+            color: #d0d5dd;
+            line-height: 1.7;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .notice-more {
+            margin-top: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--kia-green);
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .notice-more::after {
+            content: "→";
+            transition: transform 0.3s ease;
+        }
+
+        .notice-item:hover .notice-more::after {
+            transform: translateX(5px);
+        }
+
+        .loading,
+        .empty-message,
+        .error-message {
+            color: var(--text-muted);
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+
+        /* ===============================
+           滑動浮出動畫初始狀態
+        =============================== */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        /* ===============================
+           彈窗背景
+        =============================== */
+        .notice-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+
+        .notice-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ===============================
+           彈窗主體
+        =============================== */
+        .notice-modal {
+            width: min(720px, 100%);
+            max-height: 82vh;
+            overflow-y: auto;
+            background: linear-gradient(
+                135deg,
+                rgba(10, 18, 28, 0.96) 0%,
+                rgba(5, 11, 20, 0.98) 100%
+            );
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 28px;
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.75),
+                0 0 35px rgba(193, 247, 34, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            padding: 34px;
+            position: relative;
+            transform: translateY(35px) scale(0.96);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .notice-modal-overlay.active .notice-modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .notice-modal::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 28px;
+            right: 28px;
+            height: 3px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--kia-green),
+                transparent
+            );
+            border-radius: 999px;
+        }
+
+        .notice-modal-close {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 1.4rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+        }
+
+        .notice-modal-close:hover {
+            background: rgba(193, 247, 34, 0.12);
+            border-color: rgba(193, 247, 34, 0.55);
+            transform: rotate(90deg);
+        }
+
+        .notice-modal-date {
+            display: inline-block;
+            color: var(--kia-green);
+            background: rgba(193, 247, 34, 0.1);
+            padding: 7px 16px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .notice-modal-title {
+            color: #ffffff;
+            font-size: clamp(1.6rem, 4vw, 2.2rem);
+            line-height: 1.35;
+            font-weight: 800;
+            margin: 0 48px 20px 0;
+        }
+
+        .notice-modal-content {
+            color: #d0d5dd;
+            font-size: 1.05rem;
+            line-height: 1.9;
+            white-space: pre-line;
+        }
+
+        .notice-modal-content p {
+            margin: 0 0 14px;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        /* ===============================
+           手機版
+        =============================== */
+        @media (max-width: 768px) {
+            .notice-item {
+                padding: 22px 20px;
+            }
+
+            .notice-item h3 {
+                font-size: 1.2rem;
+            }
+
+            .notice-preview {
+                font-size: 0.95rem;
+            }
+
+            .notice-modal {
+                padding: 30px 22px;
+                border-radius: 24px;
+                max-height: 85vh;
+            }
+
+            .notice-modal-title {
+                margin-right: 42px;
+                font-size: 1.55rem;
+            }
+
+            .notice-modal-content {
+                font-size: 1rem;
+            }
+
+            .notice-modal-close {
+                width: 38px;
+                height: 38px;
+                top: 16px;
+                right: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="bg-particles"></div>
+
+    <div class="page-header scroll-reveal">
+        <h1>大會公告</h1>
+        <p>Announcements</p>
+    </div>
+
+    <div class="container">
+        <div class="glass-panel notice-list scroll-reveal" id="noticeList">
+            <div class="loading">公告載入中...</div>
+        </div>
+    </div>
+
+    <!-- 公告彈窗 -->
+    <div class="notice-modal-overlay" id="noticeModalOverlay">
+        <div class="notice-modal" role="dialog" aria-modal="true" aria-labelledby="noticeModalTitle">
+            <button class="notice-modal-close" id="noticeModalClose" type="button" aria-label="關閉公告彈窗">×</button>
+            <span class="notice-modal-date" id="noticeModalDate"></span>
+            <h2 class="notice-modal-title" id="noticeModalTitle"></h2>
+            <div class="notice-modal-content" id="noticeModalContent"></div>
+        </div>
+    </div>
+
+    <!-- 放在 body 最後面引入 toolbar.js -->
+    <script src="toolbar.js"></script>
+
+    <script>
+        // =========================================================
+        // 1. 背景粒子
+        // =========================================================
+        const bgContainer = document.getElementById('bg-particles');
+        const particleCount = 40;
+
+        for (let i = 0; i < particleCount; i++) {
+            const p = document.createElement('div');
+            p.classList.add('particle');
+
+            const size = Math.random() * 4 + 2 + 'px';
+            p.style.width = size;
+            p.style.height = size;
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDuration = (Math.random() * 14 + 8) + 's';
+            p.style.animationDelay = (Math.random() * 6) + 's';
+
+            bgContainer.appendChild(p);
+        }
+
+        // =========================================================
+        // 2. Lenis + GSAP ScrollTrigger
+        // =========================================================
+        gsap.registerPlugin(ScrollTrigger);
+
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smoothWheel: true
+        });
+
+        lenis.on('scroll', ScrollTrigger.update);
+
+        gsap.ticker.add((time) => {
+            lenis.raf(time * 1000);
+        });
+
+        gsap.ticker.lagSmoothing(0, 0);
+
+        // =========================================================
+        // 3. 滑到哪裡就浮出到哪裡
+        // =========================================================
+        function initScrollReveal(scope = document) {
+            const revealElements = scope.querySelectorAll('.scroll-reveal:not(.reveal-initialized)');
+
+            revealElements.forEach((el) => {
+                el.classList.add('reveal-initialized');
+
+                gsap.to(el, {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 85%",
+                        toggleActions: "play none none none"
+                    },
+                    y: 0,
+                    opacity: 1,
+                    duration: 1.1,
+                    ease: "power3.out"
+                });
+            });
+
+            ScrollTrigger.refresh();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initScrollReveal();
+        });
+
+        // =========================================================
+        // 4. Google Sheet 公告資料
+        // =========================================================
+        const ANNOUNCEMENT_CSV_URL = "https://docs.google.com/spreadsheets/d/12NoeG2RdZTtatQENam4e4H0UXjKWah852THWsFikPo0/export?format=csv&gid=0";
+
+        const noticeList = document.getElementById('noticeList');
+        const noticeModalOverlay = document.getElementById('noticeModalOverlay');
+        const noticeModalClose = document.getElementById('noticeModalClose');
+        const noticeModalDate = document.getElementById('noticeModalDate');
+        const noticeModalTitle = document.getElementById('noticeModalTitle');
+        const noticeModalContent = document.getElementById('noticeModalContent');
+
+        let announcements = [];
+
+        // =========================================================
+        // 5. CSV 解析，支援逗號、換行、雙引號
+        // =========================================================
+        function parseCSV(text) {
+            const rows = [];
+            let row = [];
+            let current = '';
+            let insideQuotes = false;
+
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const nextChar = text[i + 1];
+
+                if (char === '"' && insideQuotes && nextChar === '"') {
+                    current += '"';
+                    i++;
+                } else if (char === '"') {
+                    insideQuotes = !insideQuotes;
+                } else if (char === ',' && !insideQuotes) {
+                    row.push(current);
+                    current = '';
+                } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+                    if (char === '\r' && nextChar === '\n') {
+                        i++;
+                    }
+
+                    row.push(current);
+
+                    if (row.some(cell => cell.trim() !== '')) {
+                        rows.push(row);
+                    }
+
+                    row = [];
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+
+            row.push(current);
+
+            if (row.some(cell => cell.trim() !== '')) {
+                rows.push(row);
+            }
+
+            return rows;
+        }
+
+        // =========================================================
+        // 6. 文字安全處理，避免資料內容破壞 HTML
+        // =========================================================
+        function escapeHTML(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function normalizeHeader(value) {
+            return String(value || '')
+                .trim()
+                .toLowerCase()
+                .replace(/\s/g, '');
+        }
+
+        function findColumnIndex(headers, keywords, fallbackIndex) {
+            const normalizedHeaders = headers.map(normalizeHeader);
+
+            for (const keyword of keywords) {
+                const normalizedKeyword = normalizeHeader(keyword);
+                const index = normalizedHeaders.findIndex(header => header.includes(normalizedKeyword));
+
+                if (index !== -1) {
+                    return index;
+                }
+            }
+
+            return fallbackIndex;
+        }
+
+        function createPreview(content, maxLength = 70) {
+            const cleanText = String(content || '').replace(/\s+/g, ' ').trim();
+
+            if (cleanText.length <= maxLength) {
+                return cleanText;
+            }
+
+            return cleanText.slice(0, maxLength) + '...';
+        }
+
+        // =========================================================
+        // 7. 將 Google Sheet 轉成公告資料
+        // 表格欄位建議：
+        // A欄：標題
+        // B欄：日期
+        // C欄：內容
+        //
+        // 如果你的表頭名稱是：
+        // title / date / content
+        // 標題 / 日期 / 內容
+        // 也可以自動辨識
+        // =========================================================
+        function rowsToAnnouncements(rows) {
+            if (!rows || rows.length <= 1) {
+                return [];
+            }
+
+            const headers = rows[0];
+
+            const titleIndex = findColumnIndex(headers, ['標題', 'title', '公告標題'], 0);
+            const dateIndex = findColumnIndex(headers, ['日期', 'date', '公告日期', '時間'], 1);
+            const contentIndex = findColumnIndex(headers, ['內容', 'content', '公告內容', '說明'], 2);
+
+            return rows.slice(1)
+                .map(row => {
+                    return {
+                        title: row[titleIndex] ? row[titleIndex].trim() : '',
+                        date: row[dateIndex] ? row[dateIndex].trim() : '',
+                        content: row[contentIndex] ? row[contentIndex].trim() : ''
+                    };
+                })
+                .filter(item => item.title || item.date || item.content);
+        }
+
+        // =========================================================
+        // 8. 渲染公告列表
+        // =========================================================
+        function renderAnnouncements(data) {
+            if (!data.length) {
+                noticeList.innerHTML = '<div class="empty-message">目前尚無公告。</div>';
+                return;
+            }
+
+            const html = data.map((item, index) => {
+                return `
+                    <div class="notice-item scroll-reveal" data-index="${index}">
+                        <span class="notice-date">${escapeHTML(item.date || '未設定日期')}</span>
+                        <h3>${escapeHTML(item.title || '未命名公告')}</h3>
+                        <p class="notice-preview">${escapeHTML(createPreview(item.content || '點擊查看公告內容'))}</p>
+                        <span class="notice-more">查看公告內容</span>
+                    </div>
+                `;
+            }).join('');
+
+            noticeList.innerHTML = html;
+
+            noticeList.querySelectorAll('.notice-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const index = Number(item.getAttribute('data-index'));
+                    openNoticeModal(announcements[index]);
+                });
+            });
+
+            initScrollReveal(noticeList);
+        }
+
+        // =========================================================
+        // 9. 載入公告資料
+        // =========================================================
+        async function loadAnnouncements() {
+            try {
+                const response = await fetch(ANNOUNCEMENT_CSV_URL, {
+                    cache: 'no-store'
+                });
+
+                if (!response.ok) {
+                    throw new Error('公告資料抓取失敗');
+                }
+
+                const csvText = await response.text();
+                const rows = parseCSV(csvText);
+
+                announcements = rowsToAnnouncements(rows);
+                renderAnnouncements(announcements);
+
+            } catch (error) {
+                console.error(error);
+                noticeList.innerHTML = '<div class="error-message">公告載入失敗，請稍後重新整理。</div>';
+            }
+        }
+
+        // =========================================================
+        // 10. 彈窗開啟與關閉
+        // =========================================================
+        function openNoticeModal(item) {
+            if (!item) return;
+
+            noticeModalDate.textContent = item.date || '未設定日期';
+            noticeModalTitle.textContent = item.title || '未命名公告';
+
+            const safeContent = escapeHTML(item.content || '目前沒有公告內容。');
+            noticeModalContent.innerHTML = safeContent
+                .split('\n')
+                .map(paragraph => `<p>${paragraph}</p>`)
+                .join('');
+
+            noticeModalOverlay.classList.add('active');
+            document.body.classList.add('modal-open');
+        }
+
+        function closeNoticeModal() {
+            noticeModalOverlay.classList.remove('active');
+            document.body.classList.remove('modal-open');
+        }
+
+        noticeModalClose.addEventListener('click', closeNoticeModal);
+
+        noticeModalOverlay.addEventListener('click', (event) => {
+            if (event.target === noticeModalOverlay) {
+                closeNoticeModal();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeNoticeModal();
+            }
+        });
+
+        // =========================================================
+        // 11. 啟動
+        // =========================================================
+        loadAnnouncements();
+    </script>
+</body>
+</html>

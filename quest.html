@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>闖關卡及關卡說明 - 2026 Kia Kid's Cup</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- 滑動浮出動畫套件 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+
+    <style>
+        /* ===============================
+           Lenis 平滑滾動設定
+        =============================== */
+        html.lenis { 
+            height: auto; 
+        }
+
+        .lenis.lenis-smooth { 
+            scroll-behavior: auto; 
+        }
+
+        .lenis.lenis-smooth [data-lenis-prevent] { 
+            overscroll-behavior: contain; 
+        }
+
+        .lenis.lenis-stopped { 
+            overflow: hidden; 
+        }
+
+        .lenis.lenis-scrolling iframe { 
+            pointer-events: none; 
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .quest-container { 
+            text-align: center; 
+        }
+
+        .quest-placeholder {
+            width: 100%;
+            height: 600px;
+            border: 3px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            margin: 40px 0;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        .instructions { 
+            text-align: left; 
+            margin-top: 40px; 
+        }
+
+        .instructions h3 { 
+            color: var(--kia-green); 
+            font-size: 1.8rem; 
+            margin-bottom: 20px; 
+        }
+
+        .instructions ul { 
+            list-style-type: none; 
+        }
+
+        .instructions li { 
+            font-size: 1.2rem; 
+            margin-bottom: 15px; 
+            padding-left: 30px; 
+            position: relative; 
+        }
+
+        .instructions li::before { 
+            content: '✓'; 
+            position: absolute; 
+            left: 0; 
+            color: var(--kia-green); 
+        }
+
+        /* ===============================
+           滑動浮出動畫初始狀態
+        =============================== */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        /* ===============================
+           手機版調整
+        =============================== */
+        @media (max-width: 768px) {
+            .quest-placeholder {
+                height: 420px;
+                font-size: 1.1rem;
+                padding: 0 20px;
+                text-align: center;
+                line-height: 1.6;
+            }
+
+            .instructions h3 {
+                font-size: 1.5rem;
+            }
+
+            .instructions li {
+                font-size: 1rem;
+                line-height: 1.7;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-header scroll-reveal">
+        <h1>Quest Map</h1>
+        <p>闖關卡及關卡說明</p>
+    </div>
+
+    <div class="container quest-container">
+        <div class="glass-panel scroll-reveal">
+            <!-- 預留給闖關卡圖片的大空位 -->
+            <div class="quest-placeholder scroll-reveal">
+                [ 請在此處放入闖關卡地圖或活動圖片 ]
+            </div>
+
+            <div class="instructions scroll-reveal">
+                <h3>關卡說明</h3>
+                <ul>
+                    <li class="scroll-reveal">領取實體闖關卡後，至各區完成指定足球體驗挑戰。</li>
+                    <li class="scroll-reveal">每完成一項挑戰，即可由關主蓋上專屬通關印章。</li>
+                    <li class="scroll-reveal">集滿 5 個印章，即可至大會服務台兌換摸彩卷。</li>
+                    <li class="scroll-reveal">關卡包含：精準射門、S型盤球、疊疊樂等。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 放在 body 最後面引入 toolbar.js -->
+    <script src="toolbar.js"></script>
+
+    <script>
+        // =========================================================
+        // 1. 初始化 Lenis 平滑滾動
+        // =========================================================
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: function(t) {
+                return Math.min(1, 1.001 - Math.pow(2, -10 * t));
+            },
+            smoothWheel: true
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+
+        requestAnimationFrame(raf);
+
+        // =========================================================
+        // 2. GSAP 與 ScrollTrigger 連動
+        // =========================================================
+        gsap.registerPlugin(ScrollTrigger);
+
+        lenis.on('scroll', ScrollTrigger.update);
+
+        gsap.ticker.add(function(time) {
+            lenis.raf(time * 1000);
+        });
+
+        gsap.ticker.lagSmoothing(0, 0);
+
+        // =========================================================
+        // 3. 滑到哪裡就浮出到哪裡
+        // =========================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            gsap.utils.toArray('.scroll-reveal').forEach(function(el) {
+                gsap.to(el, {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 85%",
+                        toggleActions: "play none none none"
+                    },
+                    y: 0,
+                    opacity: 1,
+                    duration: 1.1,
+                    ease: "power3.out"
+                });
+            });
+
+            ScrollTrigger.refresh();
+        });
+    </script>
+</body>
+</html>

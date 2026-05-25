@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>相關單位 - 2026 Kia Kid's Cup</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <style>
+        /* --- 頁面基礎設定 --- */
+        body, html { min-height: 100%; margin: 0; overflow-x: hidden; position: relative; }
+
+        /* --- 精緻微光粒子背景 --- */
+        #bg-particles {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at center, #0a1420 0%, var(--bg-dark) 80%);
+            z-index: -1;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(193, 247, 34, 0.2); 
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(105vh) scale(0.5); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-5vh) scale(1); opacity: 0; }
+        }
+
+        /* 標題區域 */
+        .page-header {
+            padding: 160px 20px 60px;
+            text-align: center;
+        }
+        .page-header h1 {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .page-header p {
+            color: var(--kia-green); 
+            font-size: 1.1rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        /* --- 相關單位排版容器 --- */
+        .partners-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px 100px;
+            display: flex;
+            flex-wrap: wrap; /* 空間不夠時自動往下排 */
+            justify-content: center;
+            gap: 80px;
+        }
+
+        .partner-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1 1 300px; 
+            max-width: 420px;
+        }
+
+        /* 單位角色標題 (指導單位 / 協辦單位) */
+        .partner-role {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            border-bottom: 2px solid var(--kia-green);
+            padding-bottom: 12px;
+            display: inline-block;
+        }
+
+        /* --- 持續的 Logo 呼吸漂浮動畫 --- */
+        @keyframes hoverFloat {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* 讓第二個 Logo 呼吸頻率錯開 */
+        .anim-wrapper {
+            animation: hoverFloat 4s ease-in-out infinite;
+            margin-bottom: 25px;
+        }
+        .partner-item:nth-child(2) .anim-wrapper {
+            animation-delay: 1.5s;
+        }
+
+        /* 超連結與 Logo 本體設計 (無外框) */
+        .logo-link {
+            display: block;
+            text-decoration: none;
+            outline: none;
+        }
+        
+        .floating-logo {
+            width: 100%;
+            max-width: 280px; 
+            height: auto;
+            background: transparent;
+            border: none; 
+            border-radius: 12px; 
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease;
+        }
+
+        /* 懸停互動光暈 */
+        .logo-link:hover .floating-logo, 
+        .logo-link:focus .floating-logo {
+            transform: scale(1.08); 
+            filter: drop-shadow(0 15px 25px rgba(193, 247, 34, 0.35)); 
+        }
+
+        /* 中英文下標字體 */
+        .partner-title-zh {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+        
+        .partner-title-en {
+            font-size: 0.95rem;
+            color: var(--text-muted); 
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        /* --- GSAP 初始隱藏狀態 --- */
+        .gsap-stagger {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        /* 手機版 RWD 調適 */
+        @media (max-width: 768px) {
+            .page-header { padding: 120px 20px 40px; }
+            .partners-container { gap: 60px; }
+            .floating-logo { max-width: 240px; }
+            .partner-role { font-size: 1.25rem; margin-bottom: 30px; }
+            .partner-title-zh { font-size: 1.15rem; }
+            .partner-title-en { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg-particles"></div>
+
+    <div class="page-header">
+        <h1 class="gsap-stagger">相關單位</h1>
+        <p class="gsap-stagger">Partners</p>
+    </div>
+
+    <div class="partners-container">
+        
+        <div class="partner-item gsap-stagger">
+            <div class="partner-role">指導單位</div>
+            <div class="anim-wrapper">
+                <a href="https://www.sport.taichung.gov.tw/" target="_blank" class="logo-link">
+                    <img src="台中市政府運動局.png" alt="台中市政府運動局" class="floating-logo">
+                </a>
+            </div>
+            <div class="partner-title-zh">台中市政府運動局</div>
+            <div class="partner-title-en">Sports Bureau, Taichung City Government</div>
+        </div>
+
+        <div class="partner-item gsap-stagger">
+            <div class="partner-role">協辦單位</div>
+            <div class="anim-wrapper">
+                <a href="https://www.facebook.com/p/%E8%87%BA%E4%B8%AD%E5%B8%82%E6%B5%B7%E7%B7%9A%E8%B6%B3%E7%90%83%E5%8D%94%E6%9C%83-Taichung-City-Taiwan-61555701383095/?locale=zh_TW" target="_blank" class="logo-link">
+                    <img src="台中市海線足協.png" alt="台中市海線足球協會" class="floating-logo">
+                </a>
+            </div>
+            <div class="partner-title-zh">台中市海線足球協會</div>
+            <div class="partner-title-en">Taichung Coastal Football Association</div>
+        </div>
+
+    </div>
+
+    <script src="toolbar.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. 生成微小光粒子背景
+            const bgContainer = document.getElementById('bg-particles');
+            const particleCount = 40;
+            for (let i = 0; i < particleCount; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                const size = Math.random() * 4 + 2 + 'px'; 
+                p.style.width = size;
+                p.style.height = size;
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.animationDuration = (Math.random() * 14 + 8) + 's';
+                p.style.animationDelay = (Math.random() * 6) + 's';
+                bgContainer.appendChild(p);
+            }
+
+            // 2. GSAP 頁面載入順序浮現動畫
+            // 抓取所有標記有 .gsap-stagger 的元素，按照順序平滑浮出
+            gsap.to(".gsap-stagger", {
+                y: 0,
+                opacity: 1,
+                duration: 1.2,
+                stagger: 0.25, // 每個元素間隔 0.25 秒進場
+                ease: "power3.out",
+                delay: 0.1 // 稍微延遲讓載入更順暢
+            });
+        });
+    </script>
+</body>
+</html>

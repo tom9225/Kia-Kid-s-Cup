@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 Kia Kid's Cup - 首頁</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+
+    <style>
+        :root {
+            /* =====================================================
+               圖片路徑放這裡
+               你只要把 url('') 裡面填上自己的圖片檔案路徑即可
+
+               範例：
+               --hero-img: url('images/hero.jpg');
+               --movement-img: url('images/movement.jpg');
+               --story-img: url('images/story.jpg');
+               --kidcup-img: url('images/kidcup.jpg');
+               --final-img: url('images/final.jpg');
+            ===================================================== */
+            --hero-img: url('hero_bg.jpg');
+            --movement-img: url('play.png');
+            --story-img: url('white.png');
+            --kidcup-img: url('pink.png');
+            --final-img: url('49.png');
+        }
+
+        /* =====================================================
+           基礎設定
+        ===================================================== */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html.lenis {
+            height: auto;
+        }
+
+        .lenis.lenis-smooth {
+            scroll-behavior: auto;
+        }
+
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+
+        .lenis.lenis-scrolling iframe {
+            pointer-events: none;
+        }
+
+        body,
+        html {
+            width: 100%;
+            min-height: 100%;
+            margin: 0;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body {
+            background: var(--bg-dark);
+        }
+
+        img,
+        video {
+            max-width: 100%;
+            display: block;
+        }
+
+        /* =====================================================
+           全頁底層光粒子背景
+        ===================================================== */
+        #bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(193, 247, 34, 0.08), transparent 28%),
+                radial-gradient(circle at 85% 35%, rgba(255, 255, 255, 0.045), transparent 28%),
+                radial-gradient(circle at center, #0a1420 0%, var(--bg-dark) 78%);
+            z-index: -5;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(193, 247, 34, 0.2);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(105vh) scale(0.5);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 0.6;
+            }
+
+            80% {
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translateY(-5vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* =====================================================
+           共用圖片銜接遮罩
+           用來避免不同圖片區塊之間接得太生硬
+        ===================================================== */
+        .photo-blend-top::before,
+        .photo-blend-bottom::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 160px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .photo-blend-top::before {
+            top: 0;
+            background: linear-gradient(
+                180deg,
+                var(--bg-dark) 0%,
+                rgba(5, 11, 20, 0.82) 38%,
+                transparent 100%
+            );
+        }
+
+        .photo-blend-bottom::after {
+            bottom: 0;
+            background: linear-gradient(
+                0deg,
+                var(--bg-dark) 0%,
+                rgba(5, 11, 20, 0.82) 38%,
+                transparent 100%
+            );
+        }
+
+        /* =====================================================
+           1. 首頁主視覺
+           圖片位置：--hero-img
+        ===================================================== */
+        .hero {
+            min-height: 100vh;
+            padding: 120px 24px 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            background: #050b14;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: -4;
+            background-image: var(--hero-img);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transform: scale(1.02);
+        }
+
+        .hero-bg::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(5, 11, 20, 0.96) 0%,
+                    rgba(5, 11, 20, 0.62) 48%,
+                    rgba(5, 11, 20, 0.94) 100%
+                ),
+                linear-gradient(
+                    180deg,
+                    rgba(5, 11, 20, 0.18) 0%,
+                    rgba(5, 11, 20, 0.55) 58%,
+                    var(--bg-dark) 100%
+                ),
+                radial-gradient(
+                    circle at 72% 52%,
+                    rgba(193, 247, 34, 0.13),
+                    transparent 25%
+                );
+        }
+
+        .hero-inner {
+            width: min(1180px, 100%);
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 56px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-eyebrow {
+            color: var(--kia-green);
+            font-weight: 800;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-size: clamp(1rem, 2vw, 1.35rem);
+            margin-bottom: 22px;
+        }
+
+        .hero h1 {
+            font-size: clamp(3.8rem, 8vw, 7.5rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 0.95;
+            margin: 0;
+            color: #ffffff;
+            letter-spacing: -3px;
+            text-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+        }
+
+        .hero h1 span {
+            color: var(--kia-green);
+            display: block;
+        }
+
+        .hero-info-card {
+            background: rgba(10, 18, 28, 0.74);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 34px;
+            padding: 34px;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.58);
+            overflow: hidden;
+        }
+
+        .hero-info-card h2 {
+            color: #ffffff;
+            font-size: 1.25rem;
+            margin: 0 0 18px;
+            font-weight: 800;
+        }
+
+        .hero-info-row {
+            display: flex;
+            gap: 16px;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .hero-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .hero-info-number {
+            min-width: 40px;
+            color: var(--kia-green);
+            font-weight: 900;
+        }
+
+        .hero-info-row p {
+            color: #d0d5dd;
+            line-height: 1.75;
+            margin: 0;
+            font-size: 0.98rem;
+        }
+
+        /* =====================================================
+           通用區塊
+        ===================================================== */
+        .section {
+            padding: 110px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-container {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-label {
+            color: var(--kia-green);
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        /* =====================================================
+           2. Movement 品牌精神大圖區
+           圖片位置：--movement-img
+        ===================================================== */
+        .movement-hero {
+            min-height: 92vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            padding: 120px 24px;
+            background: #050b14;
+        }
+
+        .movement-bg {
+            position: absolute;
+            inset: 0;
+            z-index: -4;
+            background-image: var(--movement-img);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transform: scale(1.02);
+        }
+
+        .movement-bg::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(5, 11, 20, 0.96) 0%,
+                    rgba(5, 11, 20, 0.74) 42%,
+                    rgba(5, 11, 20, 0.28) 100%
+                ),
+                linear-gradient(
+                    180deg,
+                    var(--bg-dark) 0%,
+                    rgba(5, 11, 20, 0.3) 28%,
+                    rgba(5, 11, 20, 0.78) 72%,
+                    var(--bg-dark) 100%
+                );
+        }
+
+        .movement-hero::after {
+            content: "";
+            position: absolute;
+            width: 360px;
+            height: 360px;
+            right: -120px;
+            bottom: -120px;
+            border-radius: 50%;
+            background: rgba(193, 247, 34, 0.12);
+            filter: blur(10px);
+            z-index: -1;
+        }
+
+        .movement-copy {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .movement-copy-box {
+            max-width: 720px;
+            background: rgba(10, 18, 28, 0.66);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 34px;
+            padding: clamp(34px, 5vw, 60px);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .movement-copy-box h2 {
+            color: #ffffff;
+            font-size: clamp(2.4rem, 6vw, 5rem);
+            line-height: 1.02;
+            margin: 0 0 24px;
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+
+        .movement-copy-box h2 span {
+            color: var(--kia-green);
+        }
+
+        .movement-copy-box p {
+            color: #d5dde8;
+            font-size: 1.12rem;
+            line-height: 1.95;
+            margin: 0 0 18px;
+        }
+
+        /* =====================================================
+           3. 圖文雙欄故事區
+           圖片位置：--story-img
+        ===================================================== */
+        .split-story {
+            display: grid;
+            grid-template-columns: 0.95fr 1.05fr;
+            gap: 46px;
+            align-items: center;
+        }
+
+        .story-photo {
+            min-height: 560px;
+            border-radius: 36px;
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            background: #050b14;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.48);
+        }
+
+        .story-photo::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: var(--story-img);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transform: scale(1.015);
+            z-index: -2;
+        }
+
+        .story-photo::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(5, 11, 20, 0.04) 0%,
+                    rgba(5, 11, 20, 0.36) 58%,
+                    rgba(5, 11, 20, 0.82) 100%
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(5, 11, 20, 0.3),
+                    transparent 36%,
+                    rgba(5, 11, 20, 0.24)
+                );
+            z-index: -1;
+        }
+
+        .story-panel {
+            background: rgba(10, 18, 28, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 36px;
+            padding: clamp(34px, 5vw, 58px);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            overflow: hidden;
+        }
+
+        .story-panel h2 {
+            color: #ffffff;
+            font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+            line-height: 1.1;
+            margin: 0 0 24px;
+        }
+
+        .story-panel h2 span {
+            color: var(--kia-green);
+        }
+
+        .story-panel p {
+            color: #c8d0dc;
+            font-size: 1.08rem;
+            line-height: 1.95;
+            margin: 0 0 20px;
+        }
+
+        /* =====================================================
+           4. 賽事情境 Banner
+           圖片位置：--kidcup-img
+        ===================================================== */
+        .kidcup-banner-section {
+            padding: 110px 24px 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kidcup-banner-section::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(
+                    180deg,
+                    var(--bg-dark) 0%,
+                    rgba(5, 11, 20, 0.72) 36%,
+                    rgba(5, 11, 20, 0.76) 66%,
+                    var(--bg-dark) 100%
+                );
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .kidcup-banner {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+            border-radius: 40px;
+            padding: clamp(38px, 6vw, 76px);
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            background: #050b14;
+            border: 1px solid rgba(193, 247, 34, 0.22);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+            z-index: 2;
+        }
+
+        .kidcup-banner::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: var(--kidcup-img);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transform: scale(1.015);
+            z-index: -2;
+        }
+
+        .kidcup-banner::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(193, 247, 34, 0.18),
+                    rgba(10, 18, 28, 0.92) 38%,
+                    rgba(5, 11, 20, 0.98)
+                ),
+                linear-gradient(
+                    180deg,
+                    rgba(5, 11, 20, 0.12) 0%,
+                    rgba(5, 11, 20, 0.62) 100%
+                );
+            z-index: -1;
+        }
+
+        .kidcup-banner h2 {
+            color: #ffffff;
+            font-size: clamp(2.4rem, 5vw, 4.7rem);
+            line-height: 1.05;
+            margin: 0 0 24px;
+            max-width: 820px;
+        }
+
+        .kidcup-banner h2 span {
+            color: var(--kia-green);
+        }
+
+        .kidcup-banner p {
+            color: #dce3ea;
+            font-size: 1.12rem;
+            line-height: 1.9;
+            max-width: 790px;
+            margin: 0;
+        }
+
+        /* =====================================================
+           5. 最後收束區
+           改成背景圖片
+           圖片位置：--final-img
+        ===================================================== */
+        .final-section {
+            min-height: 88vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 110px 24px;
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            background: #050b14;
+        }
+
+        /* 背景影片本體 */
+        .final-bg-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+
+            /* 不要用負數，避免被背景蓋住 */
+            z-index: 0;
+
+            opacity: 1;
+        }
+
+        /* 影片上方漸層遮罩 */
+        .final-video-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(5, 11, 20, 0.88) 0%,
+                    rgba(5, 11, 20, 0.52) 52%,
+                    rgba(5, 11, 20, 0.9) 100%
+                ),
+                linear-gradient(
+                    180deg,
+                    var(--bg-dark) 0%,
+                    rgba(5, 11, 20, 0.22) 28%,
+                    rgba(5, 11, 20, 0.62) 72%,
+                    var(--bg-dark) 100%
+                ),
+                radial-gradient(
+                    circle at center,
+                    rgba(193, 247, 34, 0.13),
+                    transparent 34%
+                );
+        }
+
+        /* 文字內容在影片與遮罩上方 */
+        .final-content {
+            width: min(900px, 100%);
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .final-content h2 {
+            color: #ffffff;
+            font-size: clamp(2.7rem, 6vw, 5.4rem);
+            line-height: 1.04;
+            margin: 0 0 24px;
+            font-weight: 900;
+            text-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+        }
+
+        .final-content h2 span {
+            color: var(--kia-green);
+        }
+
+        .final-content p {
+            color: #d0d5dd;
+            font-size: 1.15rem;
+            line-height: 1.9;
+            margin: 0 auto;
+            max-width: 780px;
+            text-shadow: 0 4px 18px rgba(0, 0, 0, 0.55);
+        }
+
+        /* =====================================================
+           動畫初始狀態
+        ===================================================== */
+        .hero-elem,
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(44px);
+        }
+
+        /* =====================================================
+           RWD
+        ===================================================== */
+        @media (max-width: 1024px) {
+            .hero-inner,
+            .split-story {
+                grid-template-columns: 1fr;
+            }
+
+            .story-photo {
+                min-height: 420px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                min-height: auto;
+                padding: 110px 18px 76px;
+            }
+
+            .hero h1 {
+                letter-spacing: -1px;
+            }
+
+            .hero-info-card {
+                padding: 26px;
+                border-radius: 28px;
+            }
+
+            .section {
+                padding: 78px 18px;
+            }
+
+            .movement-hero {
+                min-height: auto;
+                padding: 88px 18px;
+            }
+
+            .movement-copy-box,
+            .story-panel {
+                border-radius: 28px;
+            }
+
+            .story-photo {
+                min-height: 340px;
+                border-radius: 28px;
+            }
+
+            .kidcup-banner-section {
+                padding: 78px 18px 86px;
+            }
+
+            .kidcup-banner {
+                border-radius: 30px;
+            }
+
+            .final-section {
+                min-height: 76vh;
+                padding: 92px 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="bg-particles"></div>
+
+    <!-- =====================================================
+         1. 首頁主視覺
+    ===================================================== -->
+    <section class="hero photo-blend-bottom">
+        <div class="hero-bg"></div>
+
+        <div class="hero-inner">
+            <div>
+                <div class="hero-eyebrow hero-elem">Movement that inspires</div>
+                <h1 class="hero-elem">2026<br><span>Kia Kid's Cup</span></h1>
+            </div>
+
+            <div class="hero-info-card hero-elem">
+                <h2>讓品牌精神進入球場</h2>
+
+                <div class="hero-info-row">
+                    <div class="hero-info-number">01</div>
+                    <p>Movement：透過奔跑、傳球與挑戰，讓孩子感受移動的力量。</p>
+                </div>
+
+                <div class="hero-info-row">
+                    <div class="hero-info-number">02</div>
+                    <p>Connection：足球讓孩子、家長、教練與隊友產生真實連結。</p>
+                </div>
+
+                <div class="hero-info-row">
+                    <div class="hero-info-number">03</div>
+                    <p>Inspiration：每一次上場，都是一次啟發自信與勇氣的機會。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         2. Movement 品牌精神大圖區
+    ===================================================== -->
+    <section class="movement-hero photo-blend-top photo-blend-bottom">
+        <div class="movement-bg"></div>
+
+        <div class="movement-copy">
+            <div class="movement-copy-box scroll-reveal">
+                <div class="section-label">Our Movement</div>
+                <h2>移動，<br><span>啟發人心</span></h2>
+                <p>
+                    Kia 相信移動不只是抵達目的地，而是讓人與人相遇、讓想法被打開，
+                    並讓每一次前進都帶來新的可能。
+                </p>
+                <p>
+                    Kia Kid's Cup 將這份精神帶入足球場，讓孩子在奔跑、合作與挑戰中，
+                    感受移動帶來的力量與啟發。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         3. 圖文雙欄故事區
+    ===================================================== -->
+    <section class="section">
+        <div class="section-container split-story">
+            <div class="story-photo scroll-reveal"></div>
+
+            <div class="story-panel scroll-reveal">
+                <h2>移動，是一種<br><span>看見世界的方式</span></h2>
+                <p>
+                    當孩子在球場上移動時，他們不只是追著足球奔跑。
+                    他們正在學習如何觀察、判斷、合作，也正在理解自己和團隊之間的關係。
+                </p>
+                <p>
+                    對 Kia Kid's Cup 而言，足球不是單純的競賽，而是一個讓孩子透過行動認識世界的入口。
+                    每一次傳球、每一次射門、每一次跌倒後再站起來，都是成長的一部分。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         4. 賽事情境 Banner
+    ===================================================== -->
+    <section class="kidcup-banner-section">
+        <div class="kidcup-banner scroll-reveal">
+            <h2>Move together,<br><span>inspire the next generation.</span></h2>
+            <p>
+                在 Kia Kid's Cup，我們相信孩子的每一次奔跑，都不只是比賽中的移動，
+                而是通往勇氣、夢想與未來的開始。讓我們一起，陪伴下一代向前。
+            </p>
+        </div>
+    </section>
+
+    <!-- =====================================================
+     5. 最後收束區
+     背景影片：end.mp4
+     無聲、自動播放、重複播放
+    ===================================================== -->
+    <section class="final-section photo-blend-top">
+        <video
+            class="final-bg-video"
+            autoplay
+            muted
+            loop
+            playsinline
+            webkit-playsinline
+            preload="auto"
+        >
+            <source src="./end.mp4" type="video/mp4">
+            你的瀏覽器不支援影片播放。
+        </video>
+
+        <div class="final-video-overlay"></div>
+
+        <div class="final-content scroll-reveal">
+            <h2>The 49th Team<br><span>starts here.</span></h2>
+            <p>
+                球場上的每一位孩子、家長、教練與工作夥伴，都是推動這場賽事前進的重要力量。<br>
+                Kia Kid's Cup 邀請你一起參與這段移動、連結與啟發的旅程。
+            </p>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // =====================================================
+            // 1. 背景粒子生成
+            // =====================================================
+            const bgContainer = document.getElementById('bg-particles');
+            const particleCount = 42;
+
+            for (let i = 0; i < particleCount; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+
+                const size = Math.random() * 4 + 2 + 'px';
+                p.style.width = size;
+                p.style.height = size;
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.animationDuration = (Math.random() * 14 + 8) + 's';
+                p.style.animationDelay = (Math.random() * 6) + 's';
+
+                bgContainer.appendChild(p);
+            }
+
+            // =====================================================
+            // 2. 初始化 Lenis 平滑滾動
+            // =====================================================
+            const lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                smoothWheel: true,
+            });
+
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
+
+            requestAnimationFrame(raf);
+
+            // =====================================================
+            // 3. GSAP 與 ScrollTrigger 連動
+            // =====================================================
+            gsap.registerPlugin(ScrollTrigger);
+
+            lenis.on('scroll', ScrollTrigger.update);
+
+            gsap.ticker.add((time) => {
+                lenis.raf(time * 1000);
+            });
+
+            gsap.ticker.lagSmoothing(0, 0);
+
+            // =====================================================
+            // 4. 開場 Hero 動畫
+            // =====================================================
+            gsap.to(".hero-elem", {
+                y: 0,
+                opacity: 1,
+                duration: 1.2,
+                ease: "power3.out",
+                stagger: 0.22,
+                delay: 0.15
+            });
+
+            // =====================================================
+            // 5. 滑到哪裡就浮出到哪裡
+            // =====================================================
+            gsap.utils.toArray('.scroll-reveal').forEach((el) => {
+                gsap.to(el, {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 85%",
+                        toggleActions: "play none none none"
+                    },
+                    y: 0,
+                    opacity: 1,
+                    duration: 1.12,
+                    ease: "power3.out"
+                });
+            });
+
+            ScrollTrigger.refresh();
+        });
+    </script>
+
+    <script src="toolbar.js"></script>
+</body>
+</html>

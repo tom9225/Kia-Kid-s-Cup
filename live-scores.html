@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>即時比分 - 2026 Kia Kid's Cup</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- GSAP / ScrollTrigger / Lenis：滑到哪裡就浮出到哪裡 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+
+    <style>
+        /* --- Lenis 平滑滾動核心設定 --- */
+        html.lenis { height: auto; }
+        .lenis.lenis-smooth { scroll-behavior: auto; }
+        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+        .lenis.lenis-stopped { overflow: hidden; }
+        .lenis.lenis-scrolling iframe { pointer-events: none; }
+
+        body, html { height: 100%; margin: 0; overflow-x: hidden; position: relative; }
+        
+        /* --- 精緻微小粒子背景 --- */
+        #bg-particles {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at center, #0a1420 0%, var(--bg-dark) 80%);
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(193, 247, 34, 0.2); 
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(105vh) scale(0.5); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-5vh) scale(1); opacity: 0; }
+        }
+
+        /* 標題區域 */
+        .page-header h1 {
+            font-size: clamp(2.3rem, 6vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .page-header p {
+            color: var(--kia-green) !important; 
+            font-size: 1.1rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        /* =========================================================
+           自訂高級感下拉選單
+        ========================================================= */
+        .select-container {
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+            margin-bottom: 40px;
+            width: 100%;
+            padding: 0 20px;
+            position: relative;
+            z-index: 999;
+        }
+        
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 360px;
+            user-select: none;
+        }
+        
+        .custom-select-trigger {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(10, 15, 26, 0.95) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            padding: 14px 45px 14px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            border-radius: 30px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        
+        .custom-select-trigger::after {
+            content: '';
+            position: absolute;
+            right: 22px;
+            top: 50%;
+            transform: translateY(-50%) rotate(0deg);
+            width: 12px;
+            height: 8px;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-size: contain;
+            transition: transform 0.4s ease;
+        }
+        
+        .custom-select-wrapper.open .custom-select-trigger::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+        
+        .custom-select-wrapper.open .custom-select-trigger,
+        .custom-select-trigger:hover {
+            border-color: rgba(193, 247, 34, 0.5);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(193, 247, 34, 0.15);
+        }
+
+        .custom-options-panel {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
+            right: 0;
+            background: rgba(10, 18, 28, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            padding: 10px 0;
+            margin: 0;
+            list-style: none;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-15px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .custom-select-wrapper.open .custom-options-panel {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .custom-option {
+            padding: 14px 20px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.25s ease;
+        }
+        
+        .custom-option:hover, .custom-option.selected {
+            background: rgba(193, 247, 34, 0.1);
+            color: var(--kia-green);
+        }
+
+        /* 分頁控制 */
+        .tab-content { display: none; width: 100%; max-width: 1200px; margin: 0 auto; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s ease forwards; }
+
+        /* 厚實毛玻璃 */
+        .thick-glass {
+            background: rgba(10, 18, 28, 0.85) !important; 
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            backdrop-filter: blur(30px) !important; 
+            -webkit-backdrop-filter: blur(30px) !important;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* 可點擊折疊標題 */
+        .collapsible-header {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0;
+            color: #ffffff;
+            border-left: 4px solid var(--kia-green);
+            padding-left: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .toggle-hint { font-size: 0.9rem; color: var(--text-muted); font-weight: normal; }
+
+        .collapsible-body {
+            max-height: 1000px; 
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0, 1, 0, 1); 
+            margin-top: 25px;
+        }
+
+        .collapsible-body.collapsed { max-height: 0; margin-top: 0; }
+
+        /* 分組名單 */
+        .group-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+            gap: 20px; 
+            padding: 10px 0; 
+        }
+
+        .group-card { 
+            background: rgba(255, 255, 255, 0.02); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 12px; 
+            padding: 20px; 
+        }
+
+        .group-title { 
+            font-size: 1.2rem; 
+            font-weight: 800; 
+            color: var(--kia-green); 
+            border-bottom: 1px solid rgba(255,255,255,0.08); 
+            padding-bottom: 8px; 
+            margin-bottom: 12px; 
+            text-align: center; 
+        }
+
+        .group-team { 
+            font-size: 1rem; 
+            padding: 6px 0; 
+            color: #d0d5dd; 
+            text-align: center; 
+        }
+
+        /* 賽程列表 */
+        .day-group { 
+            margin-bottom: 40px; 
+            background: rgba(255, 255, 255, 0.01); 
+            border: 1px solid rgba(255,255,255,0.04); 
+            border-radius: 20px; 
+            padding: 30px; 
+        }
+
+        .day-label { 
+            font-size: 1.2rem; 
+            font-weight: 700; 
+            color: var(--kia-green); 
+            margin-bottom: 20px; 
+            display: inline-block; 
+            background: rgba(193, 247, 34, 0.1); 
+            padding: 6px 18px; 
+            border-radius: 20px; 
+        }
+
+        /* 桌機版賽程表格樣式 */
+        .match-list { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+        }
+
+        .match-row {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr 2fr 1.2fr 2fr; 
+            align-items: center;
+            padding: 18px 20px;
+            background: rgba(255, 255, 255, 0.015);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .header-row { 
+            background: transparent; 
+            color: var(--text-muted); 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            padding: 5px 20px; 
+        }
+
+        .col-score { 
+            font-size: 1.2rem; 
+            font-weight: 800; 
+            color: var(--kia-green); 
+            text-align: center; 
+            letter-spacing: 1px;
+            line-height: 1.2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .pk-sub-score {
+            font-size: 0.85rem; 
+            font-weight: 500;
+            letter-spacing: 0px;
+            margin-top: 4px;
+            color: #ffffff; 
+            display: block;
+            text-align: center;
+        }
+
+        .col-time { font-weight: 700; }
+        .col-field { color: #e0e0e0; }
+        .col-team { font-weight: 600; line-height: 1.4; font-size: 1rem; } 
+        
+        .team-prefix { color: #888888; font-weight: normal; font-size: 0.9em; }
+
+        .mobile-meta-info { display: none; }
+        .mobile-match-core { display: none; }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* 滑到哪裡就浮出到哪裡 */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        /* =========================================================
+           手機版專屬 RWD 排版
+        ========================================================= */
+        @media (max-width: 768px) {
+            .thick-glass { padding: 20px; }
+            .header-row { display: none; }
+            
+            .match-row {
+                display: block;
+                padding: 20px 15px;
+                background: rgba(255, 255, 255, 0.025);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                margin-bottom: 8px;
+            }
+
+            /* 修正：手機版表頭列會變成空白框框的問題 */
+            .match-row.header-row {
+                display: none !important;
+            }
+
+            .match-row > .col-time, 
+            .match-row > .col-match, 
+            .match-row > .col-field, 
+            .match-row > .col-team, 
+            .match-row > .col-score {
+                display: none;
+            }
+
+            .mobile-meta-info {
+                display: flex;
+                flex-direction: row; 
+                align-items: center;
+                justify-content: flex-start;
+                gap: 8px;
+                margin-bottom: 15px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                padding-bottom: 12px;
+                font-size: 0.8rem; 
+                color: var(--text-muted);
+                white-space: nowrap; 
+            }
+
+            .mobile-time { font-weight: 700; color: #ffffff; }
+            .mobile-divider { color: rgba(255, 255, 255, 0.15); }
+
+            .mobile-match-core {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                gap: 5px;
+            }
+
+            .mobile-team-left {
+                flex: 1;
+                text-align: right;
+                font-weight: 600;
+                font-size: 0.85rem; 
+                white-space: normal; 
+                word-break: break-all;
+                line-height: 1.3;
+            }
+
+            .mobile-score-center {
+                font-size: 1.15rem; 
+                font-weight: 800;
+                color: var(--kia-green);
+                min-width: 65px; 
+                text-align: center;
+                letter-spacing: 1px;
+                line-height: 1.2;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .mobile-team-right {
+                flex: 1;
+                text-align: left;
+                font-weight: 600;
+                font-size: 0.85rem; 
+                white-space: normal;
+                word-break: break-all;
+                line-height: 1.3;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg-particles"></div>
+
+    <div class="page-header scroll-reveal">
+        <h1>即時比分</h1>
+        <p>Live Scores</p>
+    </div>
+
+    <div class="select-container scroll-reveal">
+        <div class="custom-select-wrapper" id="customSelect">
+            <div class="custom-select-trigger">U6 組賽程資訊</div>
+            <ul class="custom-options-panel">
+                <li class="custom-option selected" data-value="u6">U6 組賽程資訊</li>
+                <li class="custom-option" data-value="u8">U8 組賽程資訊</li>
+                <li class="custom-option" data-value="u10">U10 組賽程資訊</li>
+                <li class="custom-option" data-value="u12">U12 組賽程資訊</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="content-u6" class="tab-content active">
+            <div class="thick-glass scroll-reveal">
+                <div class="collapsible-header" onclick="toggleSection('u6-group-body')">
+                    <span>U6 分組名單</span>
+                    <span class="toggle-hint" id="u6-group-body-hint">點擊展開 ▾</span>
+                </div>
+                <div id="u6-group-body" class="collapsible-body collapsed">
+                    <div class="group-container">
+                        <div class="group-card">
+                            <div class="group-title">A組</div>
+                            <div class="group-team">小惡魔足球俱樂部</div>
+                            <div class="group-team">海線</div>
+                            <div class="group-team">平原足球俱樂部</div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">B組</div>
+                            <div class="group-team">U-Kicker</div>
+                            <div class="group-team">Original</div>
+                            <div class="group-team">迅雷</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="thick-glass scroll-reveal">
+                <h2 style="font-size:1.6rem; margin-bottom:25px; font-weight:700;">U6 即時賽程</h2>
+                <div id="u6-schedule"><div class="loading">首次載入賽程中...</div></div>
+            </div>
+        </div>
+
+        <div id="content-u8" class="tab-content">
+            <div class="thick-glass scroll-reveal">
+                <div class="collapsible-header" onclick="toggleSection('u8-group-body')">
+                    <span>U8 分組名單</span>
+                    <span class="toggle-hint" id="u8-group-body-hint">點擊展開 ▾</span>
+                </div>
+                <div id="u8-group-body" class="collapsible-body collapsed">
+                    <div class="group-container">
+                        <div class="group-card">
+                            <div class="group-title">A組</div>
+                            <div class="group-team">U-Kicker</div>
+                            <div class="group-team">Kia</div>
+                            <div class="group-team">新竹宇宙聯</div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">B組</div>
+                            <div class="group-team">旅人</div>
+                            <div class="group-team">海線</div>
+                            <div class="group-team">臺中FUTURO</div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">C組</div>
+                            <div class="group-team">平原足球</div>
+                            <div class="group-team">大安足球俱樂部</div>
+                            <div class="group-team">足夢蜻蜓</div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">D組</div>
+                            <div class="group-team">山海屯</div>
+                            <div class="group-team">東門城</div>
+                            <div class="group-team">迅雷</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="thick-glass scroll-reveal">
+                <h2 style="font-size:1.6rem; margin-bottom:25px; font-weight:700;">U8 即時賽程</h2>
+                <div id="u8-schedule"><div class="loading">首次載入賽程中...</div></div>
+            </div>
+        </div>
+
+        <div id="content-u10" class="tab-content">
+            <div class="thick-glass scroll-reveal">
+                <div class="collapsible-header" onclick="toggleSection('u10-group-body')">
+                    <span>U10 分組名單</span>
+                    <span class="toggle-hint" id="u10-group-body-hint">點擊展開 ▾</span>
+                </div>
+                <div id="u10-group-body" class="collapsible-body collapsed">
+                    <div class="group-container">
+                        <div class="group-card">
+                            <div class="group-title">A組</div>
+                            <div class="group-team">台中FUTURO</div>
+                            <div class="group-team">Faith</div>
+                            <div class="group-team">皇家訓練學院</div>
+                            <div class="group-team">臺中海線</div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">B組</div>
+                            <div class="group-team">夢幻星翼</div>
+                            <div class="group-team">Dreamers FC</div>
+                            <div class="group-team">臺中鐵山羊</div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">C組</div>
+                            <div class="group-team">海線女足</div>
+                            <div class="group-team">東門城</div>
+                            <div class="group-team">新竹足校</div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">D組</div>
+                            <div class="group-team">MUMMAT武士</div>
+                            <div class="group-team">皇家野馬</div>
+                            <div class="group-team">BT SPIRIT戰羊</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="thick-glass scroll-reveal">
+                <h2 style="font-size:1.6rem; margin-bottom:25px; font-weight:700;">U10 即時賽程</h2>
+                <div id="u10-schedule"><div class="loading">首次載入賽程中...</div></div>
+            </div>
+        </div>
+
+        <div id="content-u12" class="tab-content">
+            <div class="thick-glass scroll-reveal">
+                <div class="collapsible-header" onclick="toggleSection('u12-group-body')">
+                    <span>U12 分組名單</span>
+                    <span class="toggle-hint" id="u12-group-body-hint">點擊展開 ▾</span>
+                </div>
+                <div id="u12-group-body" class="collapsible-body collapsed">
+                    <div class="group-container">
+                        <div class="group-card">
+                            <div class="group-title">A組</div>
+                            <div class="group-team">夢幻光芒</div>
+                            <div class="group-team">新竹足校</div>
+                            <div class="group-team">MUMMAT波賽頓</div>
+                            <div class="group-team">東門城</div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">B組</div>
+                            <div class="group-team">東門城U12</div>
+                            <div class="group-team">FUTURO U12</div>
+                            <div class="group-team">新竹宇宙聯</div>
+                            <div class="group-team">臺中鐵山羊</div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">C組</div>
+                            <div class="group-team">FUTURO U11</div>
+                            <div class="group-team">大勇U12</div>
+                            <div class="group-team">BT SPIRIT閃電羊</div>
+                            <div class="group-team">皇家訓練學院</div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">D組</div>
+                            <div class="group-team">Faith</div>
+                            <div class="group-team">BEST足球俱樂部</div>
+                            <div class="group-team">小惡魔</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="thick-glass scroll-reveal">
+                <h2 style="font-size:1.6rem; margin-bottom:25px; font-weight:700;">U12 即時賽程</h2>
+                <div id="u12-schedule"><div class="loading">首次載入賽程中...</div></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="toolbar.js"></script>
+
+    <script>
+        // =========================================================
+        // 1. 背景小粒子動畫
+        // =========================================================
+        const bgContainer = document.getElementById('bg-particles');
+        const particleCount = 40;
+
+        for (let i = 0; i < particleCount; i++) {
+            const p = document.createElement('div');
+            p.classList.add('particle');
+
+            const size = Math.random() * 4 + 2 + 'px'; 
+            p.style.width = size;
+            p.style.height = size;
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDuration = (Math.random() * 14 + 8) + 's';
+            p.style.animationDelay = (Math.random() * 6) + 's';
+
+            bgContainer.appendChild(p);
+        }
+
+        // =========================================================
+        // 2. Lenis + GSAP ScrollTrigger 初始化
+        // =========================================================
+        gsap.registerPlugin(ScrollTrigger);
+
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smoothWheel: true,
+        });
+
+        lenis.on('scroll', ScrollTrigger.update);
+
+        gsap.ticker.add((time) => {
+            lenis.raf(time * 1000);
+        });
+
+        gsap.ticker.lagSmoothing(0, 0);
+
+        // =========================================================
+        // 3. 滑到哪裡就浮出到哪裡
+        // =========================================================
+        function initScrollReveal(scope = document) {
+            const revealElements = scope.querySelectorAll('.scroll-reveal:not(.reveal-initialized)');
+
+            revealElements.forEach((el) => {
+                el.classList.add('reveal-initialized');
+
+                gsap.to(el, {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 85%",
+                        toggleActions: "play none none none"
+                    },
+                    y: 0,
+                    opacity: 1,
+                    duration: 1.2,
+                    ease: "power3.out"
+                });
+            });
+
+            ScrollTrigger.refresh();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initScrollReveal();
+        });
+
+        // =========================================================
+        // 4. 自訂下拉選單互動
+        // =========================================================
+        const customSelect = document.getElementById('customSelect');
+        const selectTrigger = customSelect.querySelector('.custom-select-trigger');
+        const options = customSelect.querySelectorAll('.custom-option');
+
+        selectTrigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            customSelect.classList.toggle('open');
+        });
+
+        options.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.stopPropagation();
+
+                options.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                selectTrigger.textContent = this.textContent;
+                customSelect.classList.remove('open');
+                
+                handleSelectChange(this.getAttribute('data-value'));
+            });
+        });
+
+        document.addEventListener('click', function() {
+            customSelect.classList.remove('open');
+        });
+
+        function handleSelectChange(targetId) {
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById('content-' + targetId).classList.add('active');
+
+            setTimeout(() => {
+                ScrollTrigger.refresh();
+            }, 80);
+        }
+
+        // =========================================================
+        // 5. 手風琴收折控制
+        // =========================================================
+        function toggleSection(elementId) {
+            const body = document.getElementById(elementId);
+            const hint = document.getElementById(elementId + '-hint');
+
+            body.classList.toggle('collapsed');
+            hint.textContent = body.classList.contains('collapsed') ? '點擊展開 ▾' : '點擊收合 ▴';
+
+            setTimeout(() => {
+                ScrollTrigger.refresh();
+            }, 450);
+        }
+
+        // =========================================================
+        // 6. 隊伍名稱格式化
+        // =========================================================
+        function formatTeamName(name) {
+            if (!name) return '';
+            
+            const mainName = name.trim();
+            const prefixRegex = /^([A-Za-z]+\d+[A-Za-z]*|[(（]?\d+[)）]?[勝敗])\s*(.+)$/;
+            const match = mainName.match(prefixRegex);
+            
+            if (match) {
+                return `<span class="team-prefix">${match[1]}</span><br>${match[2].trim()}`;
+            }
+            
+            return mainName;
+        }
+
+        // =========================================================
+        // 7. 比數格式化
+        // =========================================================
+        function formatScore(score) {
+            if (!score) return 'VS';
+            
+            const formattedScore = score.trim().replace(/\s+/g, '').replace(/-/g, ':').replace(/：/g, ':');
+            const pkRegex = /^([^()\[\]{}（）]+)([()\[\]{}（）].+)/;
+            const match = formattedScore.match(pkRegex);
+            
+            if (match) {
+                return `${match[1].trim()}<span class="pk-sub-score">${match[2]}</span>`;
+            }
+            
+            return formattedScore;
+        }
+
+        // =========================================================
+        // 8. Google Sheet CSV 來源
+        // =========================================================
+        const SCHEDULE_SOURCES = [
+            {
+                key: 'u6',
+                url: 'https://docs.google.com/spreadsheets/d/1IvDlVtunu33o81nD6p19qFjS-8QSrnsI/export?format=csv&gid=193111073',
+                containerId: 'u6-schedule'
+            },
+            {
+                key: 'u8',
+                url: 'https://docs.google.com/spreadsheets/d/1IvDlVtunu33o81nD6p19qFjS-8QSrnsI/export?format=csv&gid=516413571',
+                containerId: 'u8-schedule'
+            },
+            {
+                key: 'u10',
+                url: 'https://docs.google.com/spreadsheets/d/1IvDlVtunu33o81nD6p19qFjS-8QSrnsI/export?format=csv&gid=1248848505',
+                containerId: 'u10-schedule'
+            },
+            {
+                key: 'u12',
+                url: 'https://docs.google.com/spreadsheets/d/1IvDlVtunu33o81nD6p19qFjS-8QSrnsI/export?format=csv&gid=520901600',
+                containerId: 'u12-schedule'
+            }
+        ];
+
+        let isScheduleUpdating = false;
+        let hasFirstSuccessfulLoad = false;
+
+        // =========================================================
+        // 9. CSV 簡易解析
+        // =========================================================
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let insideQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+
+                if (char === '"' && insideQuotes && nextChar === '"') {
+                    current += '"';
+                    i++;
+                } else if (char === '"') {
+                    insideQuotes = !insideQuotes;
+                } else if (char === ',' && !insideQuotes) {
+                    result.push(current);
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+
+            result.push(current);
+            return result;
+        }
+
+        // =========================================================
+        // 10. 將 CSV 轉成賽程 HTML
+        // =========================================================
+        function buildScheduleHTML(csvText) {
+            const rows = csvText.replace(/\r/g, '').split('\n');
+            const groupedData = {};
+            let hasData = false;
+
+            for (let i = 1; i < rows.length; i++) {
+                if (!rows[i].trim()) continue;
+
+                const cols = parseCSVLine(rows[i]);
+
+                if (cols.length < 5) continue;
+
+                const date = cols[0] ? cols[0].trim() : '';
+                const time = cols[1] ? cols[1].trim() : '';
+                const matchNum = cols[2] ? cols[2].trim() : '';
+                const field = cols[3] ? cols[3].trim() : ''; 
+                const teamA = cols[4] ? cols[4].trim() : '';
+                const score = cols[5] ? cols[5].trim() : 'VS'; 
+                const teamB = cols[6] ? cols[6].trim() : '';
+                
+                if (!date && !teamA) continue;
+
+                hasData = true;
+
+                if (!groupedData[date]) {
+                    groupedData[date] = [];
+                }
+
+                groupedData[date].push({ 
+                    time, 
+                    matchNum, 
+                    field, 
+                    teamA, 
+                    score, 
+                    teamB 
+                });
+            }
+
+            if (!hasData) {
+                return '<div class="loading">目前尚無最新賽程。</div>';
+            }
+
+            let htmlContent = '';
+
+            for (let date in groupedData) {
+                const matches = groupedData[date];
+
+                htmlContent += `
+                    <div class="day-group">
+                        <div class="day-label">${date}</div>
+                        <div class="match-list">
+                            <div class="match-row header-row">
+                                <div class="col-time">時間</div>
+                                <div class="col-match">場次</div>
+                                <div class="col-field">場地</div>
+                                <div class="col-team">隊伍 A</div>
+                                <div class="col-score">比數</div>
+                                <div class="col-team">隊伍 B</div>
+                            </div>
+                `;
+
+                matches.forEach(m => {
+                    const formattedTeamA = formatTeamName(m.teamA);
+                    const formattedTeamB = formatTeamName(m.teamB);
+                    const formattedScore = formatScore(m.score);
+
+                    htmlContent += `
+                            <div class="match-row">
+                                <div class="col-time">${m.time}</div>
+                                <div class="col-match">${m.matchNum}</div>
+                                <div class="col-field">${m.field}</div>
+                                <div class="col-team">${formattedTeamA}</div>
+                                <div class="col-score">${formattedScore}</div>
+                                <div class="col-team">${formattedTeamB}</div>
+
+                                <div class="mobile-meta-info">
+                                    <span class="mobile-time">${m.time}</span>
+                                    <span class="mobile-divider">|</span>
+                                    <span>場地: ${m.field}</span>
+                                    <span class="mobile-divider">•</span>
+                                    <span>場次: ${m.matchNum}</span>
+                                </div>
+
+                                <div class="mobile-match-core">
+                                    <div class="mobile-team-left">${formattedTeamA}</div>
+                                    <div class="mobile-score-center">${formattedScore}</div>
+                                    <div class="mobile-team-right">${formattedTeamB}</div>
+                                </div>
+                            </div>
+                    `;
+                });
+
+                htmlContent += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            return htmlContent;
+        }
+
+        // =========================================================
+        // 11. 單一賽程抓取
+        // =========================================================
+        async function fetchScheduleSource(source) {
+            const response = await fetch(source.url, {
+                cache: 'no-store'
+            });
+
+            if (!response.ok) {
+                throw new Error(`${source.key} 賽程抓取失敗`);
+            }
+
+            const csvText = await response.text();
+            const html = buildScheduleHTML(csvText);
+
+            return {
+                key: source.key,
+                containerId: source.containerId,
+                html
+            };
+        }
+
+        // =========================================================
+        // 12. 更新全部賽程
+        // 重點：
+        // 1. 每次更新不清空畫面
+        // 2. 不顯示更新中的 loading
+        // 3. 四組全部成功後才一起替換
+        // 4. 任一組失敗就保留舊畫面
+        // =========================================================
+        async function updateAllSchedules() {
+            if (isScheduleUpdating) return;
+
+            isScheduleUpdating = true;
+
+            try {
+                const results = await Promise.all(
+                    SCHEDULE_SOURCES.map(source => fetchScheduleSource(source))
+                );
+
+                results.forEach(result => {
+                    const container = document.getElementById(result.containerId);
+                    container.innerHTML = result.html;
+                });
+
+                hasFirstSuccessfulLoad = true;
+
+                setTimeout(() => {
+                    ScrollTrigger.refresh();
+                }, 100);
+
+            } catch (error) {
+                console.error('賽程更新失敗，保留舊畫面：', error);
+
+                if (!hasFirstSuccessfulLoad) {
+                    SCHEDULE_SOURCES.forEach(source => {
+                        const container = document.getElementById(source.containerId);
+                        container.innerHTML = '<div class="loading">賽程載入失敗，請稍後重新整理。</div>';
+                    });
+                }
+
+            } finally {
+                isScheduleUpdating = false;
+            }
+        }
+
+        // 第一次進入頁面先抓一次
+        updateAllSchedules();
+
+        // 之後每 30 秒更新一次
+        setInterval(updateAllSchedules, 30000);
+    </script>
+</body>
+</html>
