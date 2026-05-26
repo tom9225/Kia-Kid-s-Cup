@@ -12,17 +12,6 @@
 
     <style>
         :root {
-            /* =====================================================
-               圖片路徑放這裡
-               你只要把 url('') 裡面填上自己的圖片檔案路徑即可
-
-               範例：
-               --hero-img: url('images/hero.jpg');
-               --movement-img: url('images/movement.jpg');
-               --story-img: url('images/story.jpg');
-               --kidcup-img: url('images/kidcup.jpg');
-               --final-img: url('images/final.jpg');
-            ===================================================== */
             --hero-img: url('hero_bg.jpg');
             --movement-img: url('play.png');
             --story-img: url('white.png');
@@ -105,28 +94,14 @@
         }
 
         @keyframes floatUp {
-            0% {
-                transform: translateY(105vh) scale(0.5);
-                opacity: 0;
-            }
-
-            20% {
-                opacity: 0.6;
-            }
-
-            80% {
-                opacity: 0.6;
-            }
-
-            100% {
-                transform: translateY(-5vh) scale(1);
-                opacity: 0;
-            }
+            0% { transform: translateY(105vh) scale(0.5); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-5vh) scale(1); opacity: 0; }
         }
 
         /* =====================================================
            共用圖片銜接遮罩
-           用來避免不同圖片區塊之間接得太生硬
         ===================================================== */
         .photo-blend-top::before,
         .photo-blend-bottom::after {
@@ -141,31 +116,20 @@
 
         .photo-blend-top::before {
             top: 0;
-            background: linear-gradient(
-                180deg,
-                var(--bg-dark) 0%,
-                rgba(5, 11, 20, 0.82) 38%,
-                transparent 100%
-            );
+            background: linear-gradient(180deg, var(--bg-dark) 0%, rgba(5, 11, 20, 0.82) 38%, transparent 100% );
         }
 
         .photo-blend-bottom::after {
             bottom: 0;
-            background: linear-gradient(
-                0deg,
-                var(--bg-dark) 0%,
-                rgba(5, 11, 20, 0.82) 38%,
-                transparent 100%
-            );
+            background: linear-gradient(0deg, var(--bg-dark) 0%, rgba(5, 11, 20, 0.82) 38%, transparent 100% );
         }
 
         /* =====================================================
            1. 首頁主視覺
-           圖片位置：--hero-img
         ===================================================== */
         .hero {
             min-height: 100vh;
-            padding: 120px 24px 90px;
+            padding: 140px 24px 90px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -191,23 +155,9 @@
             position: absolute;
             inset: 0;
             background:
-                linear-gradient(
-                    90deg,
-                    rgba(5, 11, 20, 0.96) 0%,
-                    rgba(5, 11, 20, 0.62) 48%,
-                    rgba(5, 11, 20, 0.94) 100%
-                ),
-                linear-gradient(
-                    180deg,
-                    rgba(5, 11, 20, 0.18) 0%,
-                    rgba(5, 11, 20, 0.55) 58%,
-                    var(--bg-dark) 100%
-                ),
-                radial-gradient(
-                    circle at 72% 52%,
-                    rgba(193, 247, 34, 0.13),
-                    transparent 25%
-                );
+                linear-gradient( 90deg, rgba(5, 11, 20, 0.78) 0%, rgba(5, 11, 20, 0.45) 48%, rgba(5, 11, 20, 0.85) 100%),
+                linear-gradient( 180deg, rgba(5, 11, 20, 0.15) 0%, rgba(5, 11, 20, 0.45) 58%, var(--bg-dark) 100%),
+                radial-gradient( circle at 72% 52%, rgba(193, 247, 34, 0.1), transparent 25%);
         }
 
         .hero-inner {
@@ -245,76 +195,73 @@
             display: block;
         }
 
-        .hero-info-card {
-            background: rgba(10, 18, 28, 0.74);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 34px;
-            padding: 34px;
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.58);
-            overflow: hidden;
-        }
-
-        .hero-info-card h2 {
-            color: #ffffff;
-            font-size: 1.25rem;
-            margin: 0 0 18px;
-            font-weight: 800;
-        }
-
-        .hero-info-row {
+        /* 獨立選單按鈕 */
+        .hero-link-list {
             display: flex;
+            flex-direction: column;
             gap: 16px;
-            padding: 18px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            width: 100%;
         }
 
-        .hero-info-row:last-child {
-            border-bottom: none;
-        }
-
-        .hero-info-number {
-            min-width: 40px;
-            color: var(--kia-green);
-            font-weight: 900;
-        }
-
-        .hero-info-row p {
+        .hero-link-row {
+            background: rgba(10, 18, 28, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 18px 28px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
             color: #d0d5dd;
-            line-height: 1.75;
-            margin: 0;
-            font-size: 0.98rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hero-link-row:hover {
+            color: var(--kia-green);
+            border-color: rgba(193, 247, 34, 0.4);
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(193, 247, 34, 0.15);
         }
 
         /* =====================================================
-           通用區塊
+           --- 修正：文字移除、箭頭放大之純幾何滾動提示 ---
         ===================================================== */
-        .section {
-            padding: 110px 24px;
-            position: relative;
-            overflow: hidden;
+        .desktop-scroll-hint {
+            position: fixed;
+            bottom: 35px;
+            right: 45px;
+            z-index: 9999; /* 最上層 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none; 
+            opacity: 1;
+            transition: opacity 0.4s ease;
         }
-
-        .section-container {
-            width: min(1180px, 100%);
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
+        
+        /* 放大後的洗鍊幾何 V 型箭頭 */
+        .scroll-arrow-icon {
+            width: 84px;  /* 寬度從 16px 放大 */
+            height: 54px; /* 高度按比例放大 */
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c1f722' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-size: contain;
+            animation: arrowBounce 1.6s infinite ease-in-out;
         }
-
-        .section-label {
-            color: var(--kia-green);
-            font-size: 0.9rem;
-            font-weight: 800;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 14px;
+        
+        @keyframes arrowBounce {
+            0%, 100% { transform: translateY(0); opacity: 0.3; }
+            50% { transform: translateY(8px); opacity: 1; }
         }
 
         /* =====================================================
            2. Movement 品牌精神大圖區
-           圖片位置：--movement-img
         ===================================================== */
         .movement-hero {
             min-height: 92vh;
@@ -343,19 +290,8 @@
             position: absolute;
             inset: 0;
             background:
-                linear-gradient(
-                    90deg,
-                    rgba(5, 11, 20, 0.96) 0%,
-                    rgba(5, 11, 20, 0.74) 42%,
-                    rgba(5, 11, 20, 0.28) 100%
-                ),
-                linear-gradient(
-                    180deg,
-                    var(--bg-dark) 0%,
-                    rgba(5, 11, 20, 0.3) 28%,
-                    rgba(5, 11, 20, 0.78) 72%,
-                    var(--bg-dark) 100%
-                );
+                linear-gradient(90deg, rgba(5, 11, 20, 0.96) 0%, rgba(5, 11, 20, 0.74) 42%, rgba(5, 11, 20, 0.28) 100%),
+                linear-gradient(180deg, var(--bg-dark) 0%, rgba(5, 11, 20, 0.3) 28%, rgba(5, 11, 20, 0.78) 72%, var(--bg-dark) 100%);
         }
 
         .movement-hero::after {
@@ -391,355 +327,141 @@
         }
 
         .movement-copy-box h2 {
-            color: #ffffff;
             font-size: clamp(2.4rem, 6vw, 5rem);
             line-height: 1.02;
             margin: 0 0 24px;
             font-weight: 900;
             letter-spacing: -2px;
+            color: #ffffff;
         }
 
-        .movement-copy-box h2 span {
-            color: var(--kia-green);
-        }
-
-        .movement-copy-box p {
-            color: #d5dde8;
-            font-size: 1.12rem;
-            line-height: 1.95;
-            margin: 0 0 18px;
-        }
+        .movement-copy-box h2 span { color: var(--kia-green); }
+        .movement-copy-box p { color: #d5dde8; font-size: 1.12rem; line-height: 1.95; margin: 0 0 18px; }
 
         /* =====================================================
-           3. 圖文雙欄故事區
-           圖片位置：--story-img
+           3. 圖文雙欄故事區 (電腦版維持左右並排)
         ===================================================== */
-        .split-story {
-            display: grid;
-            grid-template-columns: 0.95fr 1.05fr;
-            gap: 46px;
-            align-items: center;
+        .split-story { 
+            display: grid; 
+            grid-template-columns: 0.95fr 1.05fr; 
+            gap: 46px; 
+            align-items: center; 
         }
-
-        .story-photo {
-            min-height: 560px;
-            border-radius: 36px;
-            position: relative;
-            overflow: hidden;
-            isolation: isolate;
-            background: #050b14;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.48);
+        .story-photo { 
+            min-height: 560px; 
+            border-radius: 36px; 
+            position: relative; 
+            overflow: hidden; 
+            isolation: isolate; 
+            background: #050b14; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.48); 
         }
-
-        .story-photo::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image: var(--story-img);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            transform: scale(1.015);
-            z-index: -2;
+        .story-photo::before { content: ""; position: absolute; inset: 0; background-image: var(--story-img); background-size: cover; background-position: center; background-repeat: no-repeat; transform: scale(1.015); z-index: -2; }
+        .story-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 11, 20, 0.04) 0%, rgba(5, 11, 20, 0.36) 58%, rgba(5, 11, 20, 0.82) 100%), linear-gradient(90deg, rgba(5, 11, 20, 0.3), transparent 36%, rgba(5, 11, 20, 0.24)); z-index: -1; }
+        
+        .story-panel { 
+            background: rgba(10, 18, 28, 0.78); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 36px; 
+            padding: clamp(34px, 5vw, 58px); 
+            backdrop-filter: blur(24px); 
+            -webkit-backdrop-filter: blur(24px); 
+            overflow: hidden; 
         }
-
-        .story-photo::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                linear-gradient(
-                    180deg,
-                    rgba(5, 11, 20, 0.04) 0%,
-                    rgba(5, 11, 20, 0.36) 58%,
-                    rgba(5, 11, 20, 0.82) 100%
-                ),
-                linear-gradient(
-                    90deg,
-                    rgba(5, 11, 20, 0.3),
-                    transparent 36%,
-                    rgba(5, 11, 20, 0.24)
-                );
-            z-index: -1;
-        }
-
-        .story-panel {
-            background: rgba(10, 18, 28, 0.78);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 36px;
-            padding: clamp(34px, 5vw, 58px);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            overflow: hidden;
-        }
-
-        .story-panel h2 {
-            color: #ffffff;
-            font-size: clamp(2.2rem, 4.5vw, 3.8rem);
-            line-height: 1.1;
-            margin: 0 0 24px;
-        }
-
-        .story-panel h2 span {
-            color: var(--kia-green);
-        }
-
-        .story-panel p {
-            color: #c8d0dc;
-            font-size: 1.08rem;
-            line-height: 1.95;
-            margin: 0 0 20px;
-        }
+        .story-panel h2 { color: #ffffff; font-size: clamp(2.2rem, 4.5vw, 3.8rem); line-height: 1.1; margin: 0 0 24px; }
+        .story-panel h2 span { color: var(--kia-green); }
+        .story-panel p { color: #c8d0dc; font-size: 1.08rem; line-height: 1.95; margin: 0 0 20px; }
 
         /* =====================================================
            4. 賽事情境 Banner
-           圖片位置：--kidcup-img
         ===================================================== */
-        .kidcup-banner-section {
-            padding: 110px 24px 120px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .kidcup-banner-section::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                linear-gradient(
-                    180deg,
-                    var(--bg-dark) 0%,
-                    rgba(5, 11, 20, 0.72) 36%,
-                    rgba(5, 11, 20, 0.76) 66%,
-                    var(--bg-dark) 100%
-                );
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .kidcup-banner {
-            width: min(1180px, 100%);
-            margin: 0 auto;
-            border-radius: 40px;
-            padding: clamp(38px, 6vw, 76px);
-            position: relative;
-            overflow: hidden;
-            isolation: isolate;
-            background: #050b14;
-            border: 1px solid rgba(193, 247, 34, 0.22);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
-            z-index: 2;
-        }
-
-        .kidcup-banner::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image: var(--kidcup-img);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            transform: scale(1.015);
-            z-index: -2;
-        }
-
-        .kidcup-banner::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(193, 247, 34, 0.18),
-                    rgba(10, 18, 28, 0.92) 38%,
-                    rgba(5, 11, 20, 0.98)
-                ),
-                linear-gradient(
-                    180deg,
-                    rgba(5, 11, 20, 0.12) 0%,
-                    rgba(5, 11, 20, 0.62) 100%
-                );
-            z-index: -1;
-        }
-
-        .kidcup-banner h2 {
-            color: #ffffff;
-            font-size: clamp(2.4rem, 5vw, 4.7rem);
-            line-height: 1.05;
-            margin: 0 0 24px;
-            max-width: 820px;
-        }
-
-        .kidcup-banner h2 span {
-            color: var(--kia-green);
-        }
-
-        .kidcup-banner p {
-            color: #dce3ea;
-            font-size: 1.12rem;
-            line-height: 1.9;
-            max-width: 790px;
-            margin: 0;
-        }
+        .kidcup-banner-section { padding: 110px 24px 120px; position: relative; overflow: hidden; }
+        .kidcup-banner-section::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, var(--bg-dark) 0%, rgba(5, 11, 20, 0.72) 36%, rgba(5, 11, 20, 0.76) 66%, var(--bg-dark) 100% ); z-index: 0; pointer-events: none; }
+        .kidcup-banner { width: min(1180px, 100%); margin: 0 auto; border-radius: 40px; padding: clamp(38px, 6vw, 76px); position: relative; overflow: hidden; isolation: isolate; background: #050b14; border: 1px solid rgba(193, 247, 34, 0.22); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55); z-index: 2; }
+        .kidcup-banner::before { content: ""; position: absolute; inset: 0; background-image: var(--kidcup-img); background-size: cover; background-position: center; background-repeat: no-repeat; transform: scale(1.015); z-index: -2; }
+        .kidcup-banner::after { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(193, 247, 34, 0.18), rgba(10, 18, 28, 0.92) 38%, rgba(5, 11, 20, 0.98)), linear-gradient(180deg, rgba(5, 11, 20, 0.12) 0%, rgba(5, 11, 20, 0.62) 100%); z-index: -1; }
+        .kidcup-banner h2 { color: #ffffff; font-size: clamp(2.4rem, 5vw, 4.7rem); line-height: 1.05; margin: 0 0 24px; max-width: 820px; }
+        .kidcup-banner h2 span { color: var(--kia-green); }
+        .kidcup-banner p { color: #dce3ea; font-size: 1.12rem; line-height: 1.9; max-width: 790px; margin: 0; }
 
         /* =====================================================
            5. 最後收束區
-           改成背景圖片
-           圖片位置：--final-img
         ===================================================== */
-        .final-section {
-            min-height: 88vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 110px 24px;
-            position: relative;
-            overflow: hidden;
-            isolation: isolate;
-            background: #050b14;
-        }
+        .final-section { min-height: 88vh; display: flex; align-items: center; justify-content: center; padding: 110px 24px; position: relative; overflow: hidden; isolation: isolate; background: #050b14; }
+        .final-bg-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 1; }
+        .final-video-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgba(5, 11, 20, 0.88) 0%, rgba(5, 11, 20, 0.52) 52%, rgba(5, 11, 20, 0.9) 100%), linear-gradient(180deg, var(--bg-dark) 0%, rgba(5, 11, 20, 0.22) 28%, rgba(5, 11, 20, 0.62) 72%, var(--bg-dark) 100%), radial-gradient(circle at center, rgba(193, 247, 34, 0.13), transparent 34% ); }
+        .final-content { width: min(900px, 100%); text-align: center; position: relative; z-index: 2; }
+        .final-content h2 { color: #ffffff; font-size: clamp(2.7rem, 6vw, 5.4rem); line-height: 1.04; margin: 0 0 24px; font-weight: 900; text-shadow: 0 8px 28px rgba(0, 0, 0, 0.65); }
+        .final-content h2 span { color: var(--kia-green); }
+        .final-content p { color: #d0d5dd; font-size: 1.15rem; line-height: 1.9; margin: 0 auto; max-width: 780px; text-shadow: 0 4px 18px rgba(0, 0, 0, 0.55); }
 
-        /* 背景影片本體 */
-        .final-bg-video {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-
-            /* 不要用負數，避免被背景蓋住 */
-            z-index: 0;
-
-            opacity: 1;
-        }
-
-        /* 影片上方漸層遮罩 */
-        .final-video-overlay {
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            pointer-events: none;
-            background:
-                linear-gradient(
-                    90deg,
-                    rgba(5, 11, 20, 0.88) 0%,
-                    rgba(5, 11, 20, 0.52) 52%,
-                    rgba(5, 11, 20, 0.9) 100%
-                ),
-                linear-gradient(
-                    180deg,
-                    var(--bg-dark) 0%,
-                    rgba(5, 11, 20, 0.22) 28%,
-                    rgba(5, 11, 20, 0.62) 72%,
-                    var(--bg-dark) 100%
-                ),
-                radial-gradient(
-                    circle at center,
-                    rgba(193, 247, 34, 0.13),
-                    transparent 34%
-                );
-        }
-
-        /* 文字內容在影片與遮罩上方 */
-        .final-content {
-            width: min(900px, 100%);
-            text-align: center;
-            position: relative;
-            z-index: 2;
-        }
-
-        .final-content h2 {
-            color: #ffffff;
-            font-size: clamp(2.7rem, 6vw, 5.4rem);
-            line-height: 1.04;
-            margin: 0 0 24px;
-            font-weight: 900;
-            text-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
-        }
-
-        .final-content h2 span {
-            color: var(--kia-green);
-        }
-
-        .final-content p {
-            color: #d0d5dd;
-            font-size: 1.15rem;
-            line-height: 1.9;
-            margin: 0 auto;
-            max-width: 780px;
-            text-shadow: 0 4px 18px rgba(0, 0, 0, 0.55);
-        }
-
-        /* =====================================================
-           動畫初始狀態
-        ===================================================== */
+        /* 動畫初始狀態 */
         .hero-elem,
-        .scroll-reveal {
+        .scroll-reveal,
+        .gsap-reveal {
             opacity: 0;
             transform: translateY(44px);
         }
 
         /* =====================================================
-           RWD
+           電腦與手機分流排版
         ===================================================== */
-        @media (max-width: 1024px) {
-            .hero-inner,
-            .split-story {
-                grid-template-columns: 1fr;
-            }
-
-            .story-photo {
-                min-height: 420px;
-            }
+        @media (min-width: 769px) {
+            .hero-link-list { display: none !important; }
+            .hero-inner { grid-template-columns: 1fr; }
         }
 
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .split-story { grid-template-columns: 1fr; }
+            .story-photo { min-height: 420px; }
+        }
+
+        /* =====================================================
+           --- 核心修正：手機版全面修復跑版樣式 ---
+        ===================================================== */
         @media (max-width: 768px) {
-            .hero {
-                min-height: auto;
-                padding: 110px 18px 76px;
+            .hero { min-height: auto; padding: 130px 18px 76px; }
+            .hero h1 { letter-spacing: -1px; }
+            
+            .desktop-scroll-hint { display: none !important; }
+
+            .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+            .hero-link-list { display: flex !important; max-width: 100%; gap: 12px; }
+            .hero-link-row { padding: 15px 20px; border-radius: 20px; font-size: 1.05rem; justify-content: center; }
+
+            /* --- 故事區完美修正：強制切換為純粹的「上照片、下文字」垂直排版 --- */
+            .split-story { 
+                grid-template-columns: 1fr !important; /* 強制單欄排列 */
+                gap: 24px !important; /* 縮小中間生硬的寬間距 */
+            }
+            .story-photo { 
+                min-height: 280px; /* 手機版最舒展的相片比例高度 */
+                border-radius: 24px; 
+                width: 100%;
+            }
+            .story-panel { 
+                border-radius: 24px; 
+                padding: 30px 20px; /* 縮小 Padding 釋放空間，避免文字爆框 */
+                width: 100%;
+            }
+            .story-panel h2 {
+                font-size: 1.8rem; /* 降低標題級別，更符合手機閱讀 */
+                line-height: 1.2;
+                margin-bottom: 16px;
+            }
+            .story-panel p {
+                font-size: 0.98rem; /* 優化段落字體大小 */
+                line-height: 1.7;
+                margin-bottom: 14px;
             }
 
-            .hero h1 {
-                letter-spacing: -1px;
-            }
-
-            .hero-info-card {
-                padding: 26px;
-                border-radius: 28px;
-            }
-
-            .section {
-                padding: 78px 18px;
-            }
-
-            .movement-hero {
-                min-height: auto;
-                padding: 88px 18px;
-            }
-
-            .movement-copy-box,
-            .story-panel {
-                border-radius: 28px;
-            }
-
-            .story-photo {
-                min-height: 340px;
-                border-radius: 28px;
-            }
-
-            .kidcup-banner-section {
-                padding: 78px 18px 86px;
-            }
-
-            .kidcup-banner {
-                border-radius: 30px;
-            }
-
-            .final-section {
-                min-height: 76vh;
-                padding: 92px 18px;
-            }
+            .section { padding: 60px 18px; }
+            .movement-hero { min-height: auto; padding: 88px 18px; }
+            .movement-copy-box { border-radius: 24px; padding: 30px 20px; }
+            .kidcup-banner-section { padding: 60px 18px; }
+            .kidcup-banner { border-radius: 24px; padding: 40px 20px; }
+            .final-section { min-height: 70vh; padding: 80px 18px; }
         }
     </style>
 </head>
@@ -747,42 +469,43 @@
 <body>
     <div id="bg-particles"></div>
 
-    <!-- =====================================================
-         1. 首頁主視覺
-    ===================================================== -->
+    <div class="desktop-scroll-hint" id="desktopScrollHint">
+        <div class="scroll-arrow-icon"></div>
+    </div>
+
     <section class="hero photo-blend-bottom">
         <div class="hero-bg"></div>
 
         <div class="hero-inner">
             <div>
                 <div class="hero-eyebrow hero-elem">Movement that inspires</div>
-                <h1 class="hero-elem">2026<br><span>Kia Kid's Cup</span></h1>
+                <h1 class="hero-elem">2026<br><span>Kia Kid's<br>Cup</span></h1>
             </div>
 
-            <div class="hero-info-card hero-elem">
-                <h2>讓品牌精神進入球場</h2>
+            <div class="hero-link-list">
+                <a href="https://www.kia.com/tw/main.html" target="_blank" class="hero-link-row hero-elem">
+                    <span class="hero-link-text">主辦單位</span>
+                </a>
 
-                <div class="hero-info-row">
-                    <div class="hero-info-number">01</div>
-                    <p>Movement：透過奔跑、傳球與挑戰，讓孩子感受移動的力量。</p>
-                </div>
+                <a href="announcements.html" class="hero-link-row hero-elem">
+                    <span class="hero-link-text">大會公告</span>
+                </a>
 
-                <div class="hero-info-row">
-                    <div class="hero-info-number">02</div>
-                    <p>Connection：足球讓孩子、家長、教練與隊友產生真實連結。</p>
-                </div>
+                <a href="live-scores.html" class="hero-link-row hero-elem">
+                    <span class="hero-link-text">即時比分</span>
+                </a>
 
-                <div class="hero-info-row">
-                    <div class="hero-info-number">03</div>
-                    <p>Inspiration：每一次上場，都是一次啟發自信與勇氣的機會。</p>
-                </div>
+                <a href="quest.html" class="hero-link-row hero-elem">
+                    <span class="hero-link-text">闖關卡及說明</span>
+                </a>
+
+                <a href="partners.html" class="hero-link-row hero-elem">
+                    <span class="hero-link-text">相關單位</span>
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- =====================================================
-         2. Movement 品牌精神大圖區
-    ===================================================== -->
     <section class="movement-hero photo-blend-top photo-blend-bottom">
         <div class="movement-bg"></div>
 
@@ -802,9 +525,6 @@
         </div>
     </section>
 
-    <!-- =====================================================
-         3. 圖文雙欄故事區
-    ===================================================== -->
     <section class="section">
         <div class="section-container split-story">
             <div class="story-photo scroll-reveal"></div>
@@ -823,9 +543,6 @@
         </div>
     </section>
 
-    <!-- =====================================================
-         4. 賽事情境 Banner
-    ===================================================== -->
     <section class="kidcup-banner-section">
         <div class="kidcup-banner scroll-reveal">
             <h2>Move together,<br><span>inspire the next generation.</span></h2>
@@ -836,21 +553,8 @@
         </div>
     </section>
 
-    <!-- =====================================================
-     5. 最後收束區
-     背景影片：end.mp4
-     無聲、自動播放、重複播放
-    ===================================================== -->
     <section class="final-section photo-blend-top">
-        <video
-            class="final-bg-video"
-            autoplay
-            muted
-            loop
-            playsinline
-            webkit-playsinline
-            preload="auto"
-        >
+        <video class="final-bg-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
             <source src="./end.mp4" type="video/mp4">
             你的瀏覽器不支援影片播放。
         </video>
@@ -911,7 +615,7 @@
 
             lenis.on('scroll', ScrollTrigger.update);
 
-            gsap.ticker.add((time) => {
+            gsap.transition = gsap.ticker.add((time) => {
                 lenis.raf(time * 1000);
             });
 
@@ -925,7 +629,7 @@
                 opacity: 1,
                 duration: 1.2,
                 ease: "power3.out",
-                stagger: 0.22,
+                stagger: 0.18,
                 delay: 0.15
             });
 
@@ -944,6 +648,20 @@
                     duration: 1.12,
                     ease: "power3.out"
                 });
+            });
+
+            // =====================================================
+            // 6. 右下角幾何箭頭：滾動接近底部自動淡出消失
+            // =====================================================
+            gsap.to("#desktopScrollHint", {
+                scrollTrigger: {
+                    trigger: document.body,
+                    start: "top top",
+                    end: "bottom bottom-=180", 
+                    scrub: true,
+                    onLeave: () => gsap.to("#desktopScrollHint", { opacity: 0, duration: 0.35 }),
+                    onEnterBack: () => gsap.to("#desktopScrollHint", { opacity: 1, duration: 0.35 })
+                }
             });
 
             ScrollTrigger.refresh();
